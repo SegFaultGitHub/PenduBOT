@@ -14,7 +14,7 @@ function sendHelpMessage(user, userID, channelID, message, evt, cmds, callback) 
             if (cmds.length === 0) {
                 return discordClient.sendMessage({
                     to: channelID,
-                    message: "Command does not exist"
+                    message: "La commande demandée n'existe pas"
                 }, function (err) {
                     if (err) return callback(err);
                     return callback(null, {
@@ -23,7 +23,7 @@ function sendHelpMessage(user, userID, channelID, message, evt, cmds, callback) 
                 });
             }
             var embed = {
-                title: "Help",
+                title: "Aide pour le bot " + botConfig.botName,
                 fields: []
             };
             cmds.forEach(function (cmd) {
@@ -58,6 +58,6 @@ module.exports = {
     },
     help: {
         usage: botConfig.prefix + path.basename(__filename, ".js") + " [COMMAND ...]",
-        message: "Display the help message for the wanted commands"
+        message: "Affiche les informations sur les commandes demandées"
     }
 };

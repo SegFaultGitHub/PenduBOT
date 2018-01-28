@@ -9,7 +9,7 @@ module.exports = {
             });
         }
         embed = {
-            title: " :bar_chart: " + botConfig.botName + "'s stats",
+            title: " :bar_chart: Statistiques de " + botConfig.botName,
             fields: []
         };
 
@@ -17,7 +17,27 @@ module.exports = {
             uptime: function (callback) {
                 embed.fields.push({
                     name: ":clock4: Uptime",
-                    value: "• **Online for**: " + libs.utils.secondsToTimestamp(libs.utils.now() - connectionDate)
+                    value: "• **En ligne depuis** : " + libs.utils.secondsToTimestamp(libs.utils.now() - connectionDate)
+                });
+                return callback();
+            },
+            global: function (callback) {
+                embed.fields.push({
+                    name: ":chart_with_upwards_trend: Statistiques globales",
+                    value: "• **Parties jouées** : " + stats.total.plays + "\n" +
+                        "• **Victoires** : " + stats.total.wins + "\n" +
+                        "• **Défaites** : " + stats.total.losses + "\n" +
+                        "• **Abandons** : " + stats.total.giveups
+                });
+                return callback();
+            },
+            personnal: function (callback) {
+                embed.fields.push({
+                    name: ":chart_with_downwards_trend: Statistiques personnelles",
+                    value: "• **Parties jouées** : " + stats[userID].plays + "\n" +
+                        "• **Victoires** : " + stats[userID].wins + "\n" +
+                        "• **Défaites** : " + stats[userID].losses + "\n" +
+                        "• **Abandons** : " + stats[userID].giveups
                 });
                 return callback();
             }
@@ -36,6 +56,6 @@ module.exports = {
     },
     help: {
         usage: botConfig.prefix + path.basename(__filename, ".js"),
-        message: "Display various stats concerning the bot"
+        message: "Affiche diverses statistiques concernant le bot"
     }
 };

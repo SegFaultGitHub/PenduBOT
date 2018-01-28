@@ -1,4 +1,32 @@
+var fs = require("fs");
+
 module.exports = function (callback) {
+    function reformat(str) {
+        str = str.toLowerCase();
+        str = str.replace(/(á|à|ä|â)/g, "a");
+        str = str.replace(/(é|è|ë|ê)/g, "e");
+        str = str.replace(/(í|ì|ï|î)/g, "i");
+        str = str.replace(/(ó|ò|ö|ô)/g, "o");
+        str = str.replace(/(ú|ù|ü|û)/g, "u");
+        str = str.replace(/(ÿ)/g, "y");
+        str = str.replace(/(ç)/g, "c");
+        str = str.replace(/\s+/g, " ");
+        return str;
+    };
+
+    words = [];
+    function initializeWordList() {
+        words = require("./words.json");
+        words.forEach(function (current, index) {
+            words[index] = reformat(current);
+        });
+        words = words.filter(function (word) {
+            return word.length >= 5 && word.length <= 10
+        });
+    }
+
+    initializeWordList();
+
     return callback(null, {
         secondsToTimestamp: function (epoch) {
             epoch = epoch / 1000;
@@ -18,6 +46,10 @@ module.exports = function (callback) {
         },
         now: function (plus) {
             return new Date().getTime() + (plus || 0) * 1e3;
-        }
+        },
+        pickWord: function () {
+            return words[Math.floor(Math.random() * words.length)];
+        },
+        reformat: reformat
     });
 };

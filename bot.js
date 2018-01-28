@@ -5,6 +5,7 @@ var Discord = require("discord.io");
 var async = require("async");
 var merge = require("merge");
 var commandLineArgs = require("command-line-args");
+var fs = require("fs");
 
 //
 // Command-line arguments
@@ -39,17 +40,35 @@ async.parallel({
 // Initialize Discord Bot
 //
 GLOBAL.discordClient = new Discord.Client({
-	token: "YOUR_DISCORD_TOKEN", // Keep it somewhere safe and offline
+	token: fs.readFileSync("./token").toString(), // Keep it somewhere safe and offline
 	autorun: true
 });
 GLOBAL.botConfig = require("./botConfig.json");
+GLOBAL.games = {};
+GLOBAL.stats = {
+	total: {
+		plays: 0,
+		wins: 0,
+		losses: 0,
+		giveups: 0
+	}
+};
 
 //
 // The function called when a message is read by the bot
 //
 function messageListener(user, userID, channelID, message, evt) {
-    // Ignore the bot's messages
+	// Ignore the bot's messages
 	if (userID === discordClient.id) return;
+
+	if (!stats[userID]) {
+		stats[userID] = {
+			plays: 0,
+			giveups: 0,
+			wins: 0,
+			losses: 0
+		};
+	}
 
 	var loweredMessage = message.toLowerCase();
 	var trimedMessage = message.trim().replace(/\s+/, " ");
@@ -57,7 +76,7 @@ function messageListener(user, userID, channelID, message, evt) {
 	return async.waterfall([
 		// If you want to add some stuff
 		function (callback) {
-            return callback();
+			return callback();
 		},
 		//commands:
 		function (callback) {
@@ -76,12 +95,12 @@ function messageListener(user, userID, channelID, message, evt) {
 var firstConnection = true;
 discordClient.on("ready", function (evt) {
 	logger.info("Logged in as: " + discordClient.username + " - (" + discordClient.id + ")");
-    
-    if (!firstConnection) return;
+
+	if (!firstConnection) return;
 	firstConnection = false;
-    
+
 	GLOBAL.connectionDate = libs.utils.now();
-	
+
 	// Automatic reconnection
 	setInterval(function () {
 		if (!discordClient.connected) discordClient.connect();
